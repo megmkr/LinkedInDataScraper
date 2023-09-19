@@ -7,7 +7,8 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver import ChromeOptions
 
 #set up the chrome driver
-service = Service(executable_path='/Users/megmkr/linkedinenv/drivers/chromedriver-mac-arm64-2/chromedriver')
+##CHANGE THIS TO WHEREVER THE CHROME DRIVER IS ON YOUR COMPUTER
+service = Service(executable_path='/Users/megmkr/linkedinenv/LinkedInDataScraper/chromedriver-mac-arm64-2/chromedriver')
 options = webdriver.ChromeOptions()
 driver = webdriver.Chrome(service=service, options=options)
 
@@ -15,6 +16,7 @@ driver = webdriver.Chrome(service=service, options=options)
 driver.get('https://www.linkedin.com/search/results/people/?origin=FACETED_SEARCH&schoolFilter=%5B19523%5D&sid=YOb')
 input("Enter in Username and Password")
 soup = BeautifulSoup(driver.page_source, 'html.parser')
+
 #alumni_list = soup.find_all("div", class_="entity-result__content entity-result__divider pt3 pb3 t-12 t-black--light")
 alumni_list = soup.find_all("a", class_= "app-aware-link")
 
@@ -48,17 +50,40 @@ for profile in alumni_list:
 
 for key, value in alum_dict.items():
   driver.get(value)
-  soup = BeautifulSoup(driver.page_source, 'html.parser')
-  body = soup.find("body")
-  print(type(body))
-  print(body.find("div", class_="pvs_list__outer-container"))
+  #soup = BeautifulSoup(driver.page_source, 'html.parser')  
+  html_content = driver.page_source
+  file_name = key + ".html"
+  alum_file = open(file_name, "w")
+  alum_file.write(html_content)
+
+  alum_file.close()
+
+
+  """
+  body2 = body.find("div", class_="application-outlet")
+  print(type(body2))
+  body3 = body2.find("div", class_="authentication-outlet")
+  print(type(body3))
+  body4 = body3.find("div",class_="extended tetris pv-profile-body-wrapper")
+  print(type(body4))
+  body4_5=body4.find("div", class_=["scaffold-layout", "scaffold-layout--breakpoint-none", "scaffold-layout--main-aside", "scaffold-layout--single-column", "scaffold-layout--reflow", "pv-profile"])
+  print(type(body4_5))
+  body5 = body4_5.find_all("div", class_=["scaffold-layout__inner", "scaffold-layout-container", "scaffold-layout-container--reflow"])
+  #wanted the second div, hense body5[1]
+  body6 = body5[1].find("div")
+  print(body6)
+  #body7 = body6.find("main")
+  #print(body7)
+  #body8 = body7.find("section", { "id" : "ember109" })
+  #print(body8)
+  """
+
   #bio = soup.find("div", class_="text-body-medium break-words")
   #alum_dict[key].append(bio.get_text())
 
 #print out dictionary for testing      
 for key, value in alum_dict.items():
   print(key, " : ", value, "\n")
-
 
 #close chrome window
 driver.quit()
