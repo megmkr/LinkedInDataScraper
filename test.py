@@ -7,8 +7,8 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver import ChromeOptions
 
 #set up the chrome driver
-##CHANGE THIS TO WHEREVER THE CHROME DRIVER IS ON YOUR COMPUTER
-service = Service(executable_path='/Users/megmkr/linkedinenv/LinkedInDataScraper/chromedriver-mac-arm64-2/chromedriver')
+#CHANGE THIS TO WHEREVER THE CHROME DRIVER IS ON YOUR COMPUTER
+service = Service(executable_path='/Users/megmkr/linkedenv/drivers/chromedriver-mac-arm64/chromedriver')
 options = webdriver.ChromeOptions()
 driver = webdriver.Chrome(service=service, options=options)
 
@@ -48,6 +48,7 @@ for profile in alumni_list:
      None
       
 
+#writing html to file
 for key, value in alum_dict.items():
   driver.get(value)
   #soup = BeautifulSoup(driver.page_source, 'html.parser')  
@@ -59,6 +60,7 @@ for key, value in alum_dict.items():
   alum_file.close()
 
 
+  #trying to find data with beautiful soup
   """
   body2 = body.find("div", class_="application-outlet")
   print(type(body2))
