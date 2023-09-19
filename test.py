@@ -7,8 +7,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver import ChromeOptions
 
 #set up the chrome driver
-#CHANGE THIS TO WHEREVER THE CHROME DRIVER IS ON YOUR COMPUTER
-service = Service(executable_path='/Users/megmkr/linkedenv/drivers/chromedriver-mac-arm64/chromedriver')
+service = Service(executable_path='/Users/megmkr/linkedinenv/drivers/chromedriver-mac-arm64-2/chromedriver')
 options = webdriver.ChromeOptions()
 driver = webdriver.Chrome(service=service, options=options)
 
