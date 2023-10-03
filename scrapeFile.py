@@ -13,6 +13,7 @@ city = city_info.find("span", class_=["text-body-small", "inline t-black--light"
 experience_section = soup.find("div", id='experience').parent
 experiences = experience_section.find_all("div", class_=["display-flex ","flex-row", "justify-space-between"])
 alum_list = []
+
 for experience in experiences:
     temp_list = []
     test = [tag for tag in experience.find_all("span", class_=["visually-hidden"]) if "t-black--light" not in tag.parent['class']]
