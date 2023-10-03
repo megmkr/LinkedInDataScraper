@@ -1,93 +1,62 @@
-#import requests 
 from bs4 import BeautifulSoup
+from selenium import webdriver
 from selenium.webdriver import Chrome
 
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver import ChromeOptions
+import pandas as pd
 
-#set up the chrome driver
-service = Service(executable_path='/Users/megmkr/linkedinenv/drivers/chromedriver-mac-arm64-2/chromedriver')
-options = webdriver.ChromeOptions()
-driver = webdriver.Chrome(service=service, options=options)
+def scrape_search(page_number):
+    i = 2
+    for i in range(page_number):
+      soup = BeautifulSoup(driver.page_source, 'html.parser')
+      #get each profile on the page
+      alumni_list = (soup.find_all("a", class_= "app-aware-link"))
+      for profile in alumni_list:
+        #get info from each profile on the page
+        profile_link = profile.get("href")
+        alumni_name = profile.find("span", attrs={'aria-hidden': True})
+        try:
+          if(len(profile_link) > 90): #this makes sure it is a profile link because I was getting other random links before
+            alum_dict.update({alumni_name.get_text(): profile_link})
+        except:
+          None
+      #getting to the next page
+      #next_button = driver.find_element(By.CSS_SELECTOR, "span.artdeco-button__text")
+      #next_button.click()
+      new_link = link[:75]+str(i)+link[76:]
+      driver.get(new_link)
+    return alumni_list
 
-#direct the chrome driver to the linkedin page with all PLNU alum
-driver.get('https://www.linkedin.com/search/results/people/?origin=FACETED_SEARCH&schoolFilter=%5B19523%5D&sid=YOb')
-input("Enter in Username and Password")
-soup = BeautifulSoup(driver.page_source, 'html.parser')
+if __name__ == '__main__':
 
-#alumni_list = soup.find_all("div", class_="entity-result__content entity-result__divider pt3 pb3 t-12 t-black--light")
-alumni_list = soup.find_all("a", class_= "app-aware-link")
+  #set up the chrome driver
+  driver = webdriver.Chrome()
 
-#print(alumni_list)
+  alum_df = pd.DataFrame(columns=['Name', 'City', 'Occupation'])
 
-alum_dict = {}
+  alumni_list = []
+  alum_dict = {}
 
-for profile in alumni_list:
-   #get info on each person from each page
-   profile_link = profile.get("href")
-   #link_getter = soup.find("a", class_= "app-aware-link")
-   #profile_link = link_getter.get("href")
-   alumni_name = profile.find("span", attrs={'aria-hidden': True})
-   #bio = profile.find("div", class_="entity-result__primary-subtitle t-14 t-black t-normal")
+  #direct the chrome driver to the linkedin page with all PLNU alum
+  link= 'https://www.linkedin.com/search/results/people/?origin=FACETED_SEARCH&page=1&schoolFilter=%5B19523%5D&sid=rl*'
+  driver.get(link)
+
+  input("Enter in Username and Password")
+  #loop scrapes first 9 pages, for range(n) n = last page nmber + 1
+  scrape_search(10)    
+ 
+  #writing html to file
+  for key, value in alum_dict.items():
+    print(key, value)
+    driver.get(value)
+    html_content = driver.page_source
+    file_name = key + ".html"
+    alum_file = open(file_name, "w", encoding='utf-8')
+    alum_file.write(html_content)
+    
+    alum_file.close()
   
-   """try: 
-     print(profile_link)
-     print(alumni_name.get_text())
-     print(bio.get_text())
-   except:
-     print("invalid data")  """
-   
-   #put it all into a dictionary
-   try:
-     if(len(profile_link) > 90): #this makes sure it is a profile link because I was getting other random links before
-        #alum_dict.update({alumni_name.get_text(): [profile_link, bio.get_text()]})
-        alum_dict.update({alumni_name.get_text(): profile_link})
-   except:
-     None
-      
-
-#writing html to file
-for key, value in alum_dict.items():
-  driver.get(value)
-  #soup = BeautifulSoup(driver.page_source, 'html.parser')  
-  html_content = driver.page_source
-  file_name = key + ".html"
-  alum_file = open(file_name, "w")
-  alum_file.write(html_content)
-
-  alum_file.close()
-
-
-  #trying to find data with beautiful soup
-  """
-  body2 = body.find("div", class_="application-outlet")
-  print(type(body2))
-  body3 = body2.find("div", class_="authentication-outlet")
-  print(type(body3))
-  body4 = body3.find("div",class_="extended tetris pv-profile-body-wrapper")
-  print(type(body4))
-  body4_5=body4.find("div", class_=["scaffold-layout", "scaffold-layout--breakpoint-none", "scaffold-layout--main-aside", "scaffold-layout--single-column", "scaffold-layout--reflow", "pv-profile"])
-  print(type(body4_5))
-  body5 = body4_5.find_all("div", class_=["scaffold-layout__inner", "scaffold-layout-container", "scaffold-layout-container--reflow"])
-  #wanted the second div, hense body5[1]
-  body6 = body5[1].find("div")
-  print(body6)
-  #body7 = body6.find("main")
-  #print(body7)
-  #body8 = body7.find("section", { "id" : "ember109" })
-  #print(body8)
-  """
-
-  #bio = soup.find("div", class_="text-body-medium break-words")
-  #alum_dict[key].append(bio.get_text())
-
-#print out dictionary for testing      
-for key, value in alum_dict.items():
-  print(key, " : ", value, "\n")
-
-#close chrome window
-driver.quit()
+  #close chrome window
+  driver.quit()
 
 
 
